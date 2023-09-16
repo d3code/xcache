@@ -77,7 +77,7 @@ func (c *cache) Add(k string, x interface{}, d time.Duration) error {
     _, found := c.get(k)
     if found {
         c.mu.Unlock()
-        return fmt.Errorf("Item %s already exists", k)
+        return fmt.Errorf("item %s already exists", k)
     }
     c.set(k, x, d)
     c.mu.Unlock()
@@ -89,7 +89,7 @@ func (c *cache) Replace(k string, x interface{}, d time.Duration) error {
     _, found := c.get(k)
     if !found {
         c.mu.Unlock()
-        return fmt.Errorf("Item %s doesn't exist", k)
+        return fmt.Errorf("item %s doesn't exist", k)
     }
     c.set(k, x, d)
     c.mu.Unlock()
@@ -249,14 +249,17 @@ func (c *cache) Load(r io.Reader) error {
     return err
 }
 
-func (c *cache) LoadFile(fname string) error {
-    fp, err := os.Open(fname)
+func (c *cache) LoadFile(name string) error {
+    fp, err := os.Open(name)
     if err != nil {
         return err
     }
     err = c.Load(fp)
     if err != nil {
-        fp.Close()
+        errFile := fp.Close()
+        if errFile != nil {
+            return errFile
+        }
         return err
     }
     return fp.Close()
